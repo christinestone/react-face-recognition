@@ -124,7 +124,10 @@ class App extends Component {
           ?
           <div>
             <Logo />
-            <Rank />
+            <Rank
+              name={this.state.user.name}
+              entries={this.state.user.entries}
+            />
             <ImageLinkForm
               onInputChange={this.onInputChange}
               onImageSubmit={this.onImageSubmit}
