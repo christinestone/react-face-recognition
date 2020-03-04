@@ -8,12 +8,6 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
-import ENV from './.env.local.js';
-
-const app = new Clarifai.App({
- apiKey: ENV.CLARIFAI_API_KEY
-});
 
 const particlesOptions = {
   particles: {
@@ -92,27 +86,32 @@ class App extends Component {
   onImageSubmit = () => {
     this.setState({imageUrl: this.state.input});
 
-    app.models.predict(
-        Clarifai.FACE_DETECT_MODEL,
-        this.state.input)
-        .then(response => {
-          if (response) {
-            fetch('https://blooming-shelf-98482.herokuapp.com/image', {
-              method: 'put',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                id: this.state.user.id
-              })
-            }).then(response => response.json())
-                .then(count => {
-                  this.setState(Object.assign(this.state.user, { entries: count }))
-                })
-                .catch(console.log)
-          }
-          this.displayFaceBox(this.calculateFaceLocation(response))
+    fetch('https://blooming-shelf-98482.herokuapp.com/imageUrl', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+    .then(response => response.json())
+    .then(response => {
+      if (response) {
+        fetch('https://blooming-shelf-98482.herokuapp.com/image', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            id: this.state.user.id
           })
-        .catch(err => console.log(err));
-  };
+        }).then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count }))
+            })
+            .catch(console.log)
+      }
+      this.displayFaceBox(this.calculateFaceLocation(response))
+      })
+    .catch(err => console.log(err));
+};
 
   render() {
     const { isSignedIn, imageUrl, route, box } = this.state;
