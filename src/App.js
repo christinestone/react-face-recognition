@@ -47,6 +47,39 @@ class App extends Component {
     this.state = initialState;
   }
 
+  componentDidMount() {
+    const token = window.sessionStorage.getItem('token');
+    if (token) {
+      fetch('https://blooming-shelf-98482.herokuapp.com/signin', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.id) {
+              fetch(`https://blooming-shelf-98482.herokuapp.com/profile/${data.id}`, {
+                method: 'get',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token
+                }
+              })
+                  .then(res => res.json())
+                  .then(user => {
+                    if (user && user.email) {
+                      this.loadUser(user);
+                      this.onRouteChange('home');
+                    }
+                  })
+            }
+          })
+          .catch(console.log)
+    }
+  }
+
   loadUser = (data) => {
     this.setState({user: {
         id: data.id,
@@ -58,19 +91,22 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    return data.outputs[0].data.regions.map(face => {
-      const clarifaiFace = face.region_info.bounding_box;
-      const image = document.getElementById('inputImage');
-      const width = Number(image.width);
-      const height = Number(image.height);
+    if (data && data.outputs) {
+      return data.outputs[0].data.regions.map(face => {
+        const clarifaiFace = face.region_info.bounding_box;
+        const image = document.getElementById('inputImage');
+        const width = Number(image.width);
+        const height = Number(image.height);
 
-      return {
-        leftCol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_row * height,
-        rightCol: width - (clarifaiFace.right_col * width),
-        bottomRow: height - (clarifaiFace.bottom_row * height)
-      }
-    });
+        return {
+          leftCol: clarifaiFace.left_col * width,
+          topRow: clarifaiFace.top_row * height,
+          rightCol: width - (clarifaiFace.right_col * width),
+          bottomRow: height - (clarifaiFace.bottom_row * height)
+        }
+      });
+    }
+    return;
   };
 
   onRouteChange = (route) => {
@@ -83,7 +119,9 @@ class App extends Component {
   };
 
   displayFaceBoxes = (boxes) => {
-    this.setState({boxes: boxes});
+    if (boxes) {
+      this.setState({boxes: boxes});
+    }
   };
 
   onInputChange = (event) => {
@@ -95,7 +133,10 @@ class App extends Component {
 
     fetch('https://blooming-shelf-98482.herokuapp.com/imageUrl', {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': window.sessionStorage.getItem('token')
+      },
       body: JSON.stringify({
         input: this.state.input
       })
@@ -105,7 +146,10 @@ class App extends Component {
       if (response) {
         fetch('https://blooming-shelf-98482.herokuapp.com/image', {
           method: 'put',
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': window.sessionStorage.getItem('token')
+          },
           body: JSON.stringify({
             id: this.state.user.id
           })
