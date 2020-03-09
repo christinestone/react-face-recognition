@@ -1,5 +1,11 @@
-This Face Recognition app takes a photo as input and uses the Clarifai face detection API to detect and highlight faces in a given photo.
+Face Recognition app takes a photo as input and uses the Clarifai face detection API to detect and highlight faces.
+It also keeps a record of users login details, hash encrypted passwords and how many photos they have used the API with.
 
+Login page
+![](src/assets/login.png)
+
+Face Recognition
+![](src/assets/face-recog.png)
 
 ## Available Scripts
 
@@ -9,16 +15,4 @@ In the project directory, you can run:
 
 Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+g
